@@ -62,6 +62,25 @@ void measureOmpOneMutex()
 
         printf("%d critical sum pairs: %f s\n", REPETITIONS, end - start);
     }
+
+    // Measure time for explicit lock/unlock pairs.
+    {
+        volatile int x = 0;
+        omp_lock_t lock;
+        omp_init_lock(&lock);
+        double start = sysTime();
+        omp_set_num_threads(1);
+        #pragma omp parallel for
+        for (int i = 0; i < REPETITIONS; ++i) {
+            omp_set_lock(&lock);
+            x += 1;
+            omp_unset_lock(&lock);
+        }
+        double end = sysTime();
+        omp_destroy_lock(&lock);
+
+        printf("%d critical sum pairs: %f s\n", REPETITIONS, end - start);
+    }
 }
 
 void measureOmp()
