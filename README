@@ -1,0 +1,10 @@
+==========================================================================
+               Guesstimate - Technology Constant Estimator
+==========================================================================
+
+Author: Manuel Holtgrewe <zyklenfrei@googlemail.com>
+
+This is just a playground for little program snippets to measure the running
+time of certain operations.  Knowing the running time of atomic operations,
+locks etc. allows informed decisions about programming when there are
+alternatives.
