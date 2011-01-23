@@ -1,7 +1,9 @@
-#include "measure_pthreads.h"
+#include <omp.h>
+
+#include "measure_omp.h"
 #include "wall_clock.h"
 
-void measurePThreadsOneMutex()
+void measureOmpOneMutex()
 {
     // Measure time for incrementing doubles as ground truth.
     {
@@ -15,10 +17,27 @@ void measurePThreadsOneMutex()
         printf("%d int sum: %f s\n", REPETITIONS, end - start);
     }
 
+    // Measure time for using OpenMP atomic operation for the addition.
+    {
+        volatile int x = 0;
+        double start = sysTime();
+        omp_set_num_threads(1);
+        #pragma omp parallel for
+        for (int i = 0; i < REPETITIONS; ++i) {
+            #pragma omp atomic
+            x += i;
+        }
+        double end = sysTime();
+
+        printf("%d double atomic sum: %f s\n", REPETITIONS, end - start);
+    }
+    
     // Measure time for using atomic operation for the addition.
     {
         volatile int x = 0;
         double start = sysTime();
+        omp_set_num_threads(1);
+        #pragma omp parallel for
         for (int i = 0; i < REPETITIONS; ++i) {
             __sync_fetch_and_add(&x, i);
         }
@@ -26,31 +45,30 @@ void measurePThreadsOneMutex()
 
         printf("%d double atomic sum: %f s\n", REPETITIONS, end - start);
     }
-    
+
     // Measure time for lock/unlock pairs.
     {
-        pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-
         volatile int x = 0;
         double start = sysTime();
+        omp_set_num_threads(1);
+        #pragma omp parallel for
         for (int i = 0; i < REPETITIONS; ++i) {
-            pthread_mutex_lock(&mutex);
-            x += i;
-            pthread_mutex_unlock(&mutex);
+            #pragma omp critical
+            {
+                x += i;
+            }
         }
         double end = sysTime();
 
-        printf("%d pthread_mutex_lock/pthread_mutex_unlock pairs: %f s\n", REPETITIONS, end - start);
-
-        pthread_mutex_destroy(&mutex);
+        printf("%d critical sum pairs: %f s\n", REPETITIONS, end - start);
     }
 }
 
-void measurePThreads()
+void measureOmp()
 {
-    std::cout << "Measuring for pthreads\n\n";
+    std::cout << "Measuring for OpenMP\n\n";
 
-    measurePThreadsOneMutex();
+    measureOmpOneMutex();
 
     std::cout << "\n\n";
 }

@@ -1,2 +1,8 @@
+*.swp
 .DS_Store
+CMakeCache.txt
 CMakeFiles
+cmake_install.cmake
+Debug
+Release
+RelDebug

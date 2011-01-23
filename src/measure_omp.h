@@ -30,12 +30,13 @@
 //
 // ==========================================================================
 
-#include "measure_pthreads.h"
-#include "measure_omp.h"
+#ifndef GUESSTIMATE_MEASURE_OMP_H_
+#define GUESSTIMATE_MEASURE_OMP_H_
 
-int main(int argc, char ** argv)
-{
-    measurePThreads();
-    measureOmp();
-    return 0;
-}
+#include <iostream>
+
+#include "measure_pthreads.h"
+
+void measureOmp();
+
+#endif  // #ifndef GUESSTIMATE_MEASURE_OMP_H_
